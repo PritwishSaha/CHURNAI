@@ -1,0 +1,6 @@
+AgeGroup,Total_Customers,Actual_Churned,Average_Churn_Probability,Actual_Churn_Rate
+Young,129,11,17.57,8.53
+Adult,695,48,21.71,6.91
+Middle_Aged,757,155,39.12,20.48
+Senior,263,132,70.02,50.19
+Elderly,156,61,51.57,39.1

@@ -1,0 +1,7 @@
+Business Problem,Observed Finding,Recommended Action,Expected Business Benefit
+High Customer Churn Risk,486 customers classified as high risk,Launch targeted retention campaigns for high-risk customers.,Potential reduction in customer attrition.
+High Churn in Germany,Germany has an actual churn rate of 29.96%.,Investigate regional customer satisfaction and service quality.,Improved regional customer retention.
+Senior Customer Churn,Senior customers have an actual churn rate of 50.19%.,Introduce personalized offers and dedicated customer support.,Improved engagement among senior customers.
+Inactive Customers,Inactive customers appear frequently among high-risk examples.,Send personalized reactivation campaigns and engagement offers.,Increased customer activity.
+Single-Product Customers,Single-product customers showed higher churn in the initial EDA.,Explore relevant cross-selling and loyalty programs.,Potentially stronger customer engagement.
+Early Churn Detection,The model generates customer-level churn probabilities.,Monitor customer risk scores regularly and prioritize follow-ups.,Earlier identification of potentially dissatisfied customers.

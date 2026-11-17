@@ -1,0 +1,14 @@
+Metric,Value
+Project,Customer Churn Prediction
+Best Algorithm,XGBoost
+Classification Threshold,0.5900000000000003
+Accuracy,0.8275
+Precision,0.5637860082304527
+Recall,0.6732186732186732
+F1 Score,0.6136618141097424
+ROC AUC,0.868765529782479
+PR AUC,0.7171190765770487
+Training Samples,8000
+Testing Samples,2000
+Input Features,14
+Processed Features,25

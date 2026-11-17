@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#12100e">
+    <title>{% block title %}ChurnAI | Customer churn intelligence{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header" id="site-header">
+        <div class="bar wrap">
+            <a class="brand" href="{{ url_for('index') }}" aria-label="ChurnAI home">
+                <span aria-hidden="true">◉</span>
+                <span>CHURN<em>AI</em></span>
+            </a>
+
+            <button class="nav-toggle" type="button" aria-controls="site-nav"
+                    aria-expanded="false" aria-label="Open menu">
+                <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M4 7h16M4 12h16M4 17h16"></path>
+                </svg>
+                <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <path d="m6 6 12 12M18 6 6 18"></path>
+                </svg>
+            </button>
+
+            <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+                {% for endpoint, label in [
+                    ('index', 'Home'), ('predict', 'Predict'), ('dashboard', 'Dashboard'),
+                    ('history', 'History'), ('about', 'About')
+                ] %}
+                    <a href="{{ url_for(endpoint) }}"
+                       {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>{{ label }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="wrap flash-messages" aria-live="polite">
+                    {% for category, message in messages %}
+                        <p class="alert{% if category == 'error' %} alert-error{% endif %}"
+                           role="{% if category == 'error' %}alert{% else %}status{% endif %}">
+                            {{ message }}
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap footer-inner">
+            <p><strong>CHURNAI</strong> · Customer churn intelligence</p>
+            <nav aria-label="Footer navigation">
+                <a class="link" href="{{ url_for('about') }}">About</a>
+                <a class="link" href="{{ url_for('history') }}">Prediction history</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script>document.documentElement.classList.add('js');</script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_macros.html" import gauge, zone_legend %}
+
+{% block title %}Prediction result{% endblock %}
+
+{% block content %}
+
+{% set zone = 'high' if record.risk_category == 'High Risk' else ('medium' if record.risk_category == 'Medium Risk' else 'low') %}
+
+<section class="result">
+    <div class="wrap result-grid">
+
+        <div class="result-visual">
+            <div class="dial-stage">
+                {{ gauge(record.churn_probability, low_pct, threshold_pct, 'lg') }}
+                {{ zone_legend(low_pct, threshold_pct) }}
+            </div>
+        </div>
+
+        <div class="result-copy">
+            <p class="result-meta">
+                Prediction #{{ record.id }}, scored
+                <time data-local datetime="{{ record.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}Z">{{ record.created_at.strftime('%d %b %Y, %H:%M') }} UTC</time>
+            </p>
+
+            {% if zone == 'high' %}
+                <h1>High chance this customer leaves</h1>
+                <p class="next-step">Reach out now. Customers in this zone are the most likely to go, so a personal call or a tailored retention offer is the best first move.</p>
+            {% elif zone == 'medium' %}
+                <h1>Worth keeping an eye on</h1>
+                <p class="next-step">The model expects this customer to stay, but the risk is not small. Add them to a watch list and check in before the score climbs.</p>
+            {% else %}
+                <h1>Likely to stay</h1>
+                <p class="next-step">No action needed right now. Keep service steady and score this customer again if their profile changes.</p>
+            {% endif %}
+
+            <h2>Customer profile</h2>
+            <dl class="profile">
+                <div><dt>Geography</dt><dd>{{ customer.Geography }}</dd></div>
+                <div><dt>Gender</dt><dd>{{ customer.Gender }}</dd></div>
+                <div><dt>Age</dt><dd>{{ customer.Age }}</dd></div>
+                <div><dt>Credit score</dt><dd>{{ customer.CreditScore }}</dd></div>
+                <div><dt>Tenure</dt><dd>{{ customer.Tenure }} {{ 'year' if customer.Tenure == 1 else 'years' }}</dd></div>
+                <div><dt>Balance</dt><dd>${{ '{:,.2f}'.format(customer.Balance) }}</dd></div>
+                <div><dt>Products</dt><dd>{{ customer.NumOfProducts }}</dd></div>
+                <div><dt>Credit card</dt><dd>{{ 'Yes' if customer.HasCrCard == 1 else 'No' }}</dd></div>
+                <div><dt>Active member</dt><dd>{{ 'Yes' if customer.IsActiveMember == 1 else 'No' }}</dd></div>
+                <div><dt>Estimated salary</dt><dd>${{ '{:,.2f}'.format(customer.EstimatedSalary) }}</dd></div>
+                <div><dt>Model call</dt><dd>{{ record.prediction }}</dd></div>
+            </dl>
+
+            <div class="result-actions">
+                <a href="{{ url_for('predict') }}" class="btn btn-primary">Score another customer</a>
+                <a href="{{ url_for('history') }}" class="btn btn-ghost">View history</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

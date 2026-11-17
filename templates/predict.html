@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Score a customer{% endblock %}
+
+{% block content %}
+
+<section class="wrap page-head">
+    <h1>Score a customer</h1>
+    <p>Fill in the details below. The model estimates the probability that this customer will leave.</p>
+</section>
+
+<div class="wrap">
+    <form id="predict-form" class="predict-layout" action="{{ url_for('predict') }}" method="post">
+
+        <div class="predict-fields">
+
+            {% if errors %}
+                <div class="alert" role="alert">
+                    <strong>{{ error_title or 'Check these details and try again' }}</strong>
+                    <ul>
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <section class="form-section">
+                <header>
+                    <h2>Profile</h2>
+                    <p>Who the customer is.</p>
+                </header>
+
+                <div class="fields">
+                    <fieldset class="field field-wide">
+                        <legend>Geography</legend>
+                        <div class="choices">
+                            {% for option in ['France', 'Germany', 'Spain'] %}
+                                <label class="choice">
+                                    <input type="radio" name="geography" value="{{ option }}" required{% if form.get('geography') == option %} checked{% endif %}>
+                                    <span>{{ option }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="field">
+                        <legend>Gender</legend>
+                        <div class="choices">
+                            {% for option in ['Male', 'Female'] %}
+                                <label class="choice">
+                                    <input type="radio" name="gender" value="{{ option }}" required{% if form.get('gender') == option %} checked{% endif %}>
+                                    <span>{{ option }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <div class="field">
+                        <label for="age">Age</label>
+                        <input class="input" type="number" id="age" name="age" inputmode="numeric"
+                               min="{{ limits.age.min }}" max="{{ limits.age.max }}" step="1" required
+                               placeholder="35" value="{{ form.get('age', '') }}">
+                        <p class="hint">{{ limits.age.min }} to {{ limits.age.max }} years</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <header>
+                    <h2>Account</h2>
+                    <p>How long they have been with the bank and what they hold.</p>
+                </header>
+
+                <div class="fields">
+                    <div class="field">
+                        <label for="credit_score">Credit score</label>
+                        <input class="input" type="number" id="credit_score" name="credit_score" inputmode="numeric"
+                               min="{{ limits.credit_score.min }}" max="{{ limits.credit_score.max }}" step="1" required
+                               placeholder="650" value="{{ form.get('credit_score', '') }}">
+                        <p class="hint">{{ limits.credit_score.min }} to {{ limits.credit_score.max }}</p>
+                    </div>
+
+                    <div class="field">
+                        <label for="tenure">Tenure</label>
+                        <input class="input" type="number" id="tenure" name="tenure" inputmode="numeric"
+                               min="{{ limits.tenure.min }}" max="{{ limits.tenure.max }}" step="1" required
+                               placeholder="5" value="{{ form.get('tenure', '') }}">
+                        <p class="hint">Whole years with the bank, {{ limits.tenure.min }} to {{ limits.tenure.max }}</p>
+                    </div>
+
+                    <div class="field">
+                        <label for="balance">Account balance</label>
+                        <div class="affix">
+                            <span aria-hidden="true">$</span>
+                            <input class="input" type="number" id="balance" name="balance" inputmode="decimal"
+                                   min="{{ limits.balance.min }}" step="0.01" required
+                                   placeholder="75000" value="{{ form.get('balance', '') }}">
+                        </div>
+                        <p class="hint">Use 0 for an empty account</p>
+                    </div>
+
+                    <fieldset class="field">
+                        <legend>Number of products</legend>
+                        <div class="choices">
+                            {% for option in ['1', '2', '3', '4'] %}
+                                <label class="choice">
+                                    <input type="radio" name="products" value="{{ option }}" required{% if form.get('products') == option %} checked{% endif %}>
+                                    <span>{{ option }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        <p class="hint">Bank products held</p>
+                    </fieldset>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <header>
+                    <h2>Engagement</h2>
+                    <p>How they use the account.</p>
+                </header>
+
+                <div class="fields">
+                    <fieldset class="field">
+                        <legend>Has a credit card</legend>
+                        <div class="choices">
+                            <label class="choice">
+                                <input type="radio" name="has_card" value="1" required{% if form.get('has_card') == '1' %} checked{% endif %}>
+                                <span>Yes</span>
+                            </label>
+                            <label class="choice">
+                                <input type="radio" name="has_card" value="0" required{% if form.get('has_card') == '0' %} checked{% endif %}>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="field">
+                        <legend>Active member</legend>
+                        <div class="choices">
+                            <label class="choice">
+                                <input type="radio" name="active_member" value="1" required{% if form.get('active_member') == '1' %} checked{% endif %}>
+                                <span>Yes</span>
+                            </label>
+                            <label class="choice">
+                                <input type="radio" name="active_member" value="0" required{% if form.get('active_member') == '0' %} checked{% endif %}>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <div class="field field-wide">
+                        <label for="salary">Estimated salary</label>
+                        <div class="affix">
+                            <span aria-hidden="true">$</span>
+                            <input class="input" type="number" id="salary" name="salary" inputmode="decimal"
+                                   min="{{ limits.salary.min }}" max="{{ limits.salary.max }}" step="0.01" required
+                                   placeholder="100000" value="{{ form.get('salary', '') }}">
+                        </div>
+                        <p class="hint">Annual salary, up to ${{ '{:,}'.format(limits.salary.max) }}</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <aside class="summary" aria-label="Profile summary">
+            <h2>Profile summary</h2>
+
+            <div class="summary-progress">
+                <p data-filled>0 of 10 details added</p>
+                <div class="meter" aria-hidden="true"><span data-meter></span></div>
+            </div>
+
+            <dl class="summary-list">
+                {% for name, label in [
+                    ('geography', 'Geography'), ('gender', 'Gender'), ('age', 'Age'),
+                    ('credit_score', 'Credit score'), ('tenure', 'Tenure'), ('balance', 'Balance'),
+                    ('products', 'Products'), ('has_card', 'Credit card'), ('active_member', 'Active member'),
+                    ('salary', 'Salary')
+                ] %}
+                    <div>
+                        <dt>{{ label }}</dt>
+                        <dd class="is-empty" data-preview="{{ name }}">Not set</dd>
+                    </div>
+                {% endfor %}
+            </dl>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                <span class="btn-spinner" aria-hidden="true"></span>
+                <span data-label>Predict churn</span>
+            </button>
+
+            <p class="hint">Each prediction is saved to History.</p>
+        </aside>
+
+    </form>
+</div>
+
+{% endblock %}

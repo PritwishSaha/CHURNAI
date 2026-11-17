@@ -1,0 +1,4 @@
+Risk_Category,Total_Customers,Actual_Churned,Average_Churn_Probability,Actual_Churn_Rate
+High Risk,486,274,79.3,56.38
+Low Risk,1042,46,13.95,4.41
+Medium Risk,472,87,43.13,18.43

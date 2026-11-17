@@ -1,0 +1,11 @@
+Metric,Value
+Total Customers,10000.0
+Churned Customers,2037.0
+Retained Customers,7963.0
+Overall Churn Rate (%),20.37
+Average Customer Age,38.92
+Average Credit Score,650.53
+Average Account Balance,76485.89
+Average Products Per Customer,1.53
+Active Member Percentage,51.51
+Zero Balance Customers,3617.0

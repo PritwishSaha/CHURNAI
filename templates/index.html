@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from "_macros.html" import gauge %}
+
+{% block title %}Customer churn prediction{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="wrap hero-grid">
+
+        <div class="hero-copy">
+            <h1>Know who is about to leave before they do.</h1>
+
+            <p class="lead">
+                ChurnAI scores bank customers on how likely they are to walk away,
+                using an XGBoost model. Enter a profile and get a clear risk reading in seconds.
+            </p>
+
+            <div class="hero-actions">
+                <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Score a customer</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-ghost btn-lg">See the dashboard</a>
+            </div>
+
+            {% if total_predictions %}
+                <dl class="hero-stats">
+                    <div>
+                        <dt>Profiles scored</dt>
+                        <dd data-count="{{ total_predictions }}">{{ total_predictions }}</dd>
+                    </div>
+                    <div>
+                        <dt>Flagged high risk</dt>
+                        <dd data-count="{{ high_risk_count }}">{{ high_risk_count }}</dd>
+                    </div>
+                </dl>
+            {% else %}
+                <p class="hero-note">Nothing has been scored yet. Your first prediction will show up here.</p>
+            {% endif %}
+        </div>
+
+        <div class="hero-visual">
+            <div class="dial-stage">
+                {{ gauge(samples[0], low_pct, threshold_pct, 'lg', cycle=samples) }}
+                <p class="dial-caption">Sample readings, one from each risk zone</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="section-head">
+            <h2>From customer details to a risk reading</h2>
+        </div>
+
+        <ol class="steps">
+            <li>
+                <span class="step-num">1</span>
+                <h3>Enter a profile</h3>
+                <p>Add ten details about the customer: where they live, how long they have banked with you, what they hold and how active they are.</p>
+            </li>
+            <li>
+                <span class="step-num">2</span>
+                <h3>Get a risk reading</h3>
+                <p>The model returns a churn probability and places it in a low, medium or high risk zone.</p>
+            </li>
+            <li>
+                <span class="step-num">3</span>
+                <h3>Decide what to do</h3>
+                <p>High-risk customers get a retention call first. Medium-risk customers go on a watch list.</p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap split">
+        <div class="section-head">
+            <h2>What is under the hood</h2>
+            <p>A gradient boosting model, tuned to flag the customers who matter.</p>
+        </div>
+
+        <dl class="spec">
+            <div><dt>Algorithm</dt><dd>XGBoost gradient boosting</dd></div>
+            <div><dt>Accuracy</dt><dd>About 83% on test data</dd></div>
+            <div><dt>ROC-AUC</dt><dd>About 87%</dd></div>
+            <div><dt>Inputs</dt><dd>10 customer details and 4 engineered features</dd></div>
+            <div><dt>Decision rule</dt><dd>A tuned probability threshold splits customers into three risk zones</dd></div>
+        </dl>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap cta-band">
+        <h2>Score your next customer.</h2>
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Start a prediction</a>
+    </div>
+</section>
+
+{% endblock %}

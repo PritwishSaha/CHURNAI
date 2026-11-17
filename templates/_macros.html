@@ -1,0 +1,52 @@
+{#
+  Risk dial. `value`, `low` and `thr` are percentages (0 to 100).
+  The dial arc is a half circle drawn with pathLength="100", so every
+  dash length below is already a percentage of the arc.
+#}
+{% macro gauge(value, low, thr, size='lg', cycle=none) -%}
+{% set value_pct = [0, [100, value|float]|min]|max %}
+{% set low_pct = [0, [100, low|float]|min]|max %}
+{% set threshold_pct = [low_pct, [100, thr|float]|min]|max %}
+{% set zone = 'low' if value_pct < low_pct else ('medium' if value_pct < threshold_pct else 'high') %}
+{% set arc = 'M 20 118 A 100 100 0 0 1 220 118' %}
+<figure class="gauge gauge-{{ size }} is-{{ zone }}"
+        data-gauge
+        data-value="{{ value_pct }}"
+        data-low="{{ low_pct }}"
+        data-thr="{{ threshold_pct }}"
+        {% if cycle %}data-cycle="{{ cycle|join(',') }}"{% endif %}
+        role="img"
+        aria-label="Churn probability {{ '%.1f'|format(value_pct) }} percent, {{ zone }} risk zone">
+    <svg viewBox="0 0 240 190" aria-hidden="true" focusable="false">
+        <path class="gauge-zone zone-low" d="{{ arc }}" pathLength="100" stroke-dasharray="{{ low_pct }} 100"/>
+        <path class="gauge-zone zone-medium" d="{{ arc }}" pathLength="100" stroke-dasharray="{{ threshold_pct - low_pct }} 100" stroke-dashoffset="{{ -low_pct }}"/>
+        <path class="gauge-zone zone-high" d="{{ arc }}" pathLength="100" stroke-dasharray="{{ 100 - threshold_pct }} 100" stroke-dashoffset="{{ -threshold_pct }}"/>
+
+        <path class="gauge-fill" d="{{ arc }}" pathLength="100" stroke-dasharray="{{ value_pct }} 100"/>
+
+        <line class="gauge-tick" x1="206" y1="118" x2="230" y2="118" transform="rotate({{ 180 + low_pct * 1.8 }} 120 118)"/>
+        <line class="gauge-tick" x1="206" y1="118" x2="230" y2="118" transform="rotate({{ 180 + threshold_pct * 1.8 }} 120 118)"/>
+
+        <g class="gauge-needle" style="transform: rotate({{ 180 + value_pct * 1.8 }}deg)">
+            <line x1="120" y1="118" x2="196" y2="118"/>
+        </g>
+        <circle class="gauge-hub" cx="120" cy="118" r="7"/>
+    </svg>
+
+    <div class="gauge-readout">
+        <span class="gauge-num" data-gauge-num>{{ '%.1f'|format(value_pct) }}</span><span class="gauge-unit">%</span>
+        <span class="gauge-state" data-gauge-state>{{ zone|capitalize }} risk</span>
+    </div>
+</figure>
+{%- endmacro %}
+
+
+{% macro zone_legend(low, thr) -%}
+{% set low_pct = [0, [100, low|float]|min]|max %}
+{% set threshold_pct = [low_pct, [100, thr|float]|min]|max %}
+<ul class="zone-legend" aria-label="Risk zones">
+    <li class="zl-low"><i></i>Low below {{ '%g'|format(low_pct|round(1)) }}%</li>
+    <li class="zl-medium"><i></i>Medium {{ '%g'|format(low_pct|round(1)) }}% to {{ '%g'|format(threshold_pct|round(1)) }}%</li>
+    <li class="zl-high"><i></i>High from {{ '%g'|format(threshold_pct|round(1)) }}%</li>
+</ul>
+{%- endmacro %}

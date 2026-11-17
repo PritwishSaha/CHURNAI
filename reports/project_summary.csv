@@ -1,0 +1,16 @@
+Metric,Value
+Dataset Records,10000
+Original Features,14
+Training Records,8000
+Testing Records,2000
+Best Model,XGBoost
+Classification Threshold,0.59
+Accuracy,0.83
+Precision,0.56
+Recall,0.67
+F1 Score,0.61
+ROC-AUC,0.8688
+PR-AUC,0.7171
+High-Risk Customers,486
+Medium-Risk Customers,472
+Low-Risk Customers,1042

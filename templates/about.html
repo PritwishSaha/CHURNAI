@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% from "_macros.html" import zone_legend %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+
+<section class="wrap page-head">
+    <h1>About ChurnAI</h1>
+    <p>Machine learning that shows which customers are at risk of leaving, so you can act while there is still time.</p>
+</section>
+
+<section class="section">
+    <div class="wrap split">
+        <div class="section-head">
+            <h2>What ChurnAI does</h2>
+        </div>
+
+        <div class="prose">
+            <p>
+                ChurnAI is a customer churn prediction system built on an XGBoost model.
+                It helps teams find customers who are likely to leave, so they can plan
+                retention work around data instead of hunches.
+            </p>
+            <p>
+                The model reads 10 customer details and builds four extra features from them.
+                On test data it reaches about 83% accuracy and a ROC-AUC of about 87%.
+            </p>
+            <p>
+                Every result lands in one of three risk zones. A tuned threshold decides
+                where the line sits, and the dial shows exactly where each customer falls.
+            </p>
+            {{ zone_legend(low_pct, threshold_pct) }}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="section-head">
+            <h2>What you enter</h2>
+            <p>Ten details go into every prediction.</p>
+        </div>
+
+        <dl class="features">
+            <div><dt>Credit score</dt><dd>Customer credit rating, {{ limits.credit_score.min }} to {{ limits.credit_score.max }}</dd></div>
+            <div><dt>Geography</dt><dd>France, Germany or Spain</dd></div>
+            <div><dt>Gender</dt><dd>Male or female</dd></div>
+            <div><dt>Age</dt><dd>{{ limits.age.min }} to {{ limits.age.max }} years</dd></div>
+            <div><dt>Tenure</dt><dd>Years with the bank, {{ limits.tenure.min }} to {{ limits.tenure.max }}</dd></div>
+            <div><dt>Balance</dt><dd>Current account balance</dd></div>
+            <div><dt>Products</dt><dd>Number of bank products, {{ limits.products.min }} to {{ limits.products.max }}</dd></div>
+            <div><dt>Credit card</dt><dd>Whether the customer has one</dd></div>
+            <div><dt>Active member</dt><dd>Whether the customer is active</dd></div>
+            <div><dt>Salary</dt><dd>Estimated annual salary</dd></div>
+        </dl>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="section-head">
+            <h2>What the model adds</h2>
+            <p>Four features are worked out for you before scoring.</p>
+        </div>
+
+        <dl class="features features-engineered">
+            <div><dt>Age group</dt><dd>Young, Adult, Middle aged, Senior or Elderly</dd></div>
+            <div><dt>Balance status</dt><dd>Zero balance or has a balance</dd></div>
+            <div><dt>Customer activity</dt><dd>Active or inactive, from membership status</dd></div>
+            <div><dt>Product category</dt><dd>Single product, two products or multiple products</dd></div>
+        </dl>
+    </div>
+</section>
+
+<section class="section" id="maker">
+    <div class="wrap split">
+        <div class="section-head">
+            <h2>Meet the maker</h2>
+        </div>
+
+        <div class="maker">
+            <figure class="maker-photo{% if not maker_photo %} is-placeholder{% endif %}">
+                {% if maker_photo %}
+                    <img src="{{ maker_photo }}" alt="Portrait of {{ maker.name }}" loading="lazy" decoding="async">
+                {% else %}
+                    <span class="maker-initials" aria-hidden="true">{{ maker.initials }}</span>
+                {% endif %}
+            </figure>
+
+            <div class="maker-copy">
+                <h3>{{ maker.name }}</h3>
+                <p>{{ maker.role }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap cta-band">
+        <h2>Ready to see a prediction?</h2>
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Score a customer</a>
+    </div>
+</section>
+
+{% endblock %}

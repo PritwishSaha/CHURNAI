@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction history{% endblock %}
+
+{% block content %}
+
+<section class="wrap page-head">
+    <h1>Prediction history</h1>
+    <p>Every customer you have scored, newest first. Select a date to open the full result.</p>
+</section>
+
+<div class="wrap">
+
+{% if filter_counts.all == 0 %}
+
+    <div class="empty">
+        <h2>No predictions yet</h2>
+        <p>Your scored customers will be listed here so you can look back at any of them.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Score a customer</a>
+    </div>
+
+{% else %}
+
+    <div class="toolbar">
+        <nav class="filters" aria-label="Filter by risk">
+            {% for key, label in [('all', 'All'), ('high', 'High risk'), ('medium', 'Medium risk'), ('low', 'Low risk')] %}
+                <a class="filter" href="{{ url_for('history', risk=(key if key != 'all' else none)) }}"{% if risk == key %} aria-current="true"{% endif %}>
+                    {{ label }} <small>{{ filter_counts[key] }}</small>
+                </a>
+            {% endfor %}
+        </nav>
+
+        <a href="{{ url_for('predict') }}" class="btn btn-primary">Score a customer</a>
+    </div>
+
+    {% if records %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Scored</th>
+                        <th scope="col">Geography</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Age</th>
+                        <th scope="col">Credit score</th>
+                        <th scope="col">Balance</th>
+                        <th scope="col">Products</th>
+                        <th scope="col">Churn probability</th>
+                        <th scope="col">Prediction</th>
+                        <th scope="col">Risk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                        {% set zone = 'high' if record.risk_category == 'High Risk' else ('medium' if record.risk_category == 'Medium Risk' else 'low') %}
+                        <tr>
+                            <td>
+                                <a class="link" href="{{ url_for('result', record_id=record.id) }}" title="Open prediction #{{ record.id }}">
+                                    <time data-local data-short datetime="{{ record.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}Z">{{ record.created_at.strftime('%d %b %Y, %H:%M') }} UTC</time>
+                                </a>
+                            </td>
+                            <td>{{ record.geography }}</td>
+                            <td>{{ record.gender }}</td>
+                            <td class="num">{{ record.age }}</td>
+                            <td class="num">{{ record.credit_score }}</td>
+                            <td class="num">${{ '{:,.0f}'.format(record.balance) }}</td>
+                            <td class="num">{{ record.products }}</td>
+                            <td class="num strong">{{ '%.1f'|format(record.churn_probability) }}%</td>
+                            <td>{{ record.prediction }}</td>
+                            <td><span class="tag tag-{{ zone }}">{{ zone|capitalize }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if pagination.pages > 1 %}
+            <nav class="pager" aria-label="Pages">
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for('history', page=pagination.prev_num, risk=(risk if risk != 'all' else none)) }}" rel="prev">Previous</a>
+                {% else %}
+                    <span class="is-disabled">Previous</span>
+                {% endif %}
+
+                {% for page_number in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_number %}
+                        {% if page_number == pagination.page %}
+                            <span class="is-current" aria-current="page">{{ page_number }}</span>
+                        {% else %}
+                            <a href="{{ url_for('history', page=page_number, risk=(risk if risk != 'all' else none)) }}">{{ page_number }}</a>
+                        {% endif %}
+                    {% else %}
+                        <span class="is-gap">&hellip;</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                    <a href="{{ url_for('history', page=pagination.next_num, risk=(risk if risk != 'all' else none)) }}" rel="next">Next</a>
+                {% else %}
+                    <span class="is-disabled">Next</span>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="empty">
+            <h2>Nothing in this view</h2>
+            <p>No predictions match this filter yet.</p>
+            <a href="{{ url_for('history') }}" class="btn btn-ghost">Show all predictions</a>
+        </div>
+    {% endif %}
+
+{% endif %}
+
+</div>
+
+{% endblock %}

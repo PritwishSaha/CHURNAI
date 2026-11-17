@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% from "_macros.html" import gauge, zone_legend %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<section class="wrap page-head">
+    <h1>Dashboard</h1>
+    <p>How the predictions you have run so far break down by risk and by country.</p>
+</section>
+
+<div class="wrap">
+
+{% if total == 0 %}
+
+    <div class="empty">
+        {{ gauge(0, low_pct, threshold_pct, 'sm') }}
+        <h2>No predictions yet</h2>
+        <p>Score a customer and the risk mix, averages and country breakdown will appear here.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Score a customer</a>
+    </div>
+
+{% else %}
+
+    <section class="overview-grid" aria-label="Overview">
+
+        <div class="overview-main">
+            <dl class="kpis">
+                <div>
+                    <dt>Predictions scored</dt>
+                    <dd data-count="{{ total }}">{{ total }}</dd>
+                </div>
+                <div>
+                    <dt>Flagged as churn risk</dt>
+                    <dd data-count="{{ flagged }}">{{ flagged }}</dd>
+                </div>
+            </dl>
+
+            <h2 class="panel-title">Risk mix</h2>
+
+            <div class="stack-bar" data-bars role="img"
+                 aria-label="Risk mix: {% for item in risk_mix %}{{ item.label }} {{ item.share }} percent{% if not loop.last %}, {% endif %}{% endfor %}">
+                {% for item in risk_mix if item.count %}
+                    <span class="seg seg-{{ item.key }}" style="--w: {{ item.share }}%"></span>
+                {% endfor %}
+            </div>
+
+            <ul class="legend">
+                {% for item in risk_mix %}
+                    <li class="lg-{{ item.key }}">
+                        <i aria-hidden="true"></i>
+                        <span>{{ item.label }}</span>
+                        <b>{{ item.count }}</b>
+                        <span>{{ item.share }}%</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="dial-stage">
+            <h2 class="panel-title">Average churn probability</h2>
+            {{ gauge(average, low_pct, threshold_pct, 'md') }}
+            {{ zone_legend(low_pct, threshold_pct) }}
+        </div>
+
+    </section>
+
+    <section class="section" style="margin-top: clamp(28px, 4vw, 40px);">
+        <div class="split">
+            <div>
+                <h2 class="panel-title">By geography</h2>
+                <ul class="hbars" data-bars>
+                    {% for geo in geo_stats %}
+                        <li>
+                            <div class="hbar-head">
+                                <span>{{ geo.name }}</span>
+                                <span>{{ geo.average }}% average, {{ geo.count }} {{ 'prediction' if geo.count == 1 else 'predictions' }}</span>
+                            </div>
+                            <div class="hbar zone-{{ geo.zone }}"><span style="--w: {{ geo.average }}%"></span></div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="panel-title">Latest predictions</h2>
+                <ul class="recent">
+                    {% for record in recent %}
+                        {% set zone = 'high' if record.risk_category == 'High Risk' else ('medium' if record.risk_category == 'Medium Risk' else 'low') %}
+                        <li>
+                            <a href="{{ url_for('result', record_id=record.id) }}">
+                                <span class="prob">{{ '%.1f'|format(record.churn_probability) }}%</span>
+                                <span>{{ record.geography }}, age {{ record.age }}</span>
+                                <span class="tag tag-{{ zone }}">{{ zone|capitalize }}</span>
+                                <time class="when" data-local datetime="{{ record.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}Z">{{ record.created_at.strftime('%d %b %Y, %H:%M') }} UTC</time>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p style="margin-top: 18px;"><a class="link" href="{{ url_for('history') }}">See all predictions</a></p>
+            </div>
+        </div>
+    </section>
+
+{% endif %}
+
+</div>
+
+{% endblock %}
